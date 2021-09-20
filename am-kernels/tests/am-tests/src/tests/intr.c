@@ -1,8 +1,11 @@
 #include <amtest.h>
+#define CLINT_START 0x2000000
+#define CLINT_MTIMECMP (CLINT_START + 0x4000)
 
 Context *simple_trap(Event ev, Context *ctx) {
   switch(ev.event) {
     case EVENT_IRQ_TIMER:
+      *((uint64_t *) CLINT_MTIMECMP) += 7000000;
       putch('t'); break;
     case EVENT_IRQ_IODEV:
       putch('d'); break;
