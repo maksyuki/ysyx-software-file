@@ -5,7 +5,7 @@
 Context *simple_trap(Event ev, Context *ctx) {
   switch(ev.event) {
     case EVENT_IRQ_TIMER:
-      *((uint64_t *) CLINT_MTIMECMP) += 7000000;
+      *((uint64_t *) CLINT_MTIMECMP) += 700000;
       putch('t'); break;
     case EVENT_IRQ_IODEV:
       putch('d'); break;
@@ -23,7 +23,7 @@ void hello_intr() {
   io_read(AM_INPUT_CONFIG);
   iset(1);
   while (1) {
-    for (volatile int i = 0; i < 100; i++) ;
+    for (volatile int i = 0; i < 10000; i++) ;
     yield();
   }
 }
