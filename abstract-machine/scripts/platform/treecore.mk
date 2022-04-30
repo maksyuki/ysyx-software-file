@@ -11,7 +11,7 @@ AM_SRCS := treecore/trm.c \
            treecore/isa/$(ISA)/start.S
 
 CFLAGS    += -fdata-sections -ffunction-sections
-LDFLAGS   += -T $(AM_HOME)/scripts/platform/treecore.ld --defsym=_entry_offset=0x100000
+LDFLAGS   += -T $(AM_HOME)/scripts/platform/treecore.ld --defsym=_entry_offset=0x0
 LDFLAGS   += --gc-sections -e _start
 NEMUFLAGS += -b -l $(shell dirname $(IMAGE).elf)/treecore-log.txt $(IMAGE).bin
 
