@@ -7,7 +7,7 @@ struct Context {
   void *pdir;
 };
 
-#define GPR1 gpr[17] // a7
+#define GPR1 gpr[17] // a7 for 'c->GPR1 == -1' check in cte.c
 #define GPR2 gpr[0]
 #define GPR3 gpr[0]
 #define GPR4 gpr[0]

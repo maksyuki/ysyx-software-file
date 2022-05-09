@@ -13,7 +13,7 @@ Context* __am_irq_handle(Context *c) {
       case 11:
         if (c->GPR1 == -1) {
           ev.event = EVENT_YIELD;
-          c->epc += 4;
+          c->epc += 4; // important!!!
         } else {
           ev.event = EVENT_SYSCALL;
         }
@@ -33,7 +33,8 @@ extern void __am_asm_trap(void);
 
 bool cte_init(Context*(*handler)(Event, Context*)) {
   // initialize exception entry
-  asm volatile("csrw stvec, %0" : : "r"(__am_asm_trap));
+  // asm volatile("csrw stvec, %0" : : "r"(__am_asm_trap));
+  asm volatile("csrw mtvec, %0" : : "r"(__am_asm_trap)); // NOTE: just test only machine mode!
 
   // register event handler
   user_handler = handler;
