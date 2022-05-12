@@ -10,13 +10,25 @@
 #endif
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
-  TODO();
+  FILE * file = fopen(filename, "rb");
+  
+  if (file) {
+    Elf_Ehdr hdr;
+    int num = fread(&hdr, sizeof(hdr), 1, file);
+    if (memcmp(hdr.e_ident, ELFMAG, SELFMAG) == 0) {
+      Log("===========================VALID ELF FILE %d", num);
+
+    }
+    fclose(file);
+  }
+  // ramdisk_read();
+  // ramdisk_write();
   return 0;
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
   uintptr_t entry = loader(pcb, filename);
   Log("Jump to entry = %p", entry);
-  ((void(*)())entry) ();
+  // ((void(*)())entry) ();
 }
 
