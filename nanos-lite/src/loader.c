@@ -23,7 +23,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   const uint32_t elf_magic = 0x464c457f;
 	uint32_t *p_magic = (void *)buf;
   assert (*p_magic == elf_magic);
-  Log("ELF: %p", elf);
+  // Log("ELF: %p", elf);
 
   ph = (void *)(buf + elf->e_phoff);
   for (int i = 0; i < elf->e_phnum; ++i, ++ph) {
@@ -46,6 +46,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 void naive_uload(PCB *pcb, const char *filename) {
   uintptr_t entry = loader(pcb, filename);
   Log("Jump to entry = %p", entry);
-  // ((void(*)())entry) ();
+  ((void(*)())entry) ();
 }
 

@@ -3,7 +3,7 @@
 static Context* do_event(Event e, Context* c) {
   switch (e.event) {
     case EVENT_YIELD:
-      Log("[nanos-lite] yield test"); break;
+      Log("[nanos-lite] ======YIELD TEST RESULT======"); break;
     default: panic("Unhandled event ID = %d", e.event);
   }
 

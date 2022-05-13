@@ -56,12 +56,12 @@ bool ienabled() {
 
 // interrupt set, just for interrupt test
 void iset(bool enable) {
-  uint64_t mie_mtie = 0x080;
-  if (enable) {
-    asm volatile("csrsi mstatus, 8");
-    asm volatile("csrs mie, %0" : : "r"(mie_mtie));
-  } else {
-    asm volatile("csrci mstatus, 8");
-    asm volatile("csrc mie, %0" : : "r"(mie_mtie));
-  }
+  // uint64_t mie_mtie = 0x080;
+  // if (enable) {
+    // asm volatile("csrsi mstatus, 8");
+    // asm volatile("csrs mie, %0" : : "r"(mie_mtie));
+  // } else {
+    // asm volatile("csrci mstatus, 8");
+    // asm volatile("csrc mie, %0" : : "r"(mie_mtie));
+  // }
 }
