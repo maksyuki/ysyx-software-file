@@ -16,6 +16,7 @@ Context* __am_irq_handle(Context *c) {
           c->epc += 4; // important!!!
         } else {
           ev.event = EVENT_SYSCALL;
+          // c->epc += 4; // important!!!
         }
         break;
       default:
