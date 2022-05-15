@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <time.h>
+#include <stdio.h>
 #include "syscall.h"
 
 // helper macros
@@ -66,8 +67,26 @@ int _write(int fd, void *buf, size_t count) {
   // return 0;
 }
 
+extern intptr_t end;
+
 void *_sbrk(intptr_t increment) {
-  return (void *)-1;
+  intptr_t *pbk = &end;
+  intptr_t *origin = pbk;
+
+  //debug, NOTE: cannot use printf, otherwise trigger loop!
+  char buf[60];
+  int len = sprintf(buf, "end: %10p\n", &end);
+  _write(1, buf, len);
+
+  intptr_t res = _syscall_(SYS_brk, 0, 0, 0);
+  if (res == 0) {
+    pbk = (intptr_t*) ((char*)pbk + increment);
+    return (void *)origin;
+  } else if (res == -1) {
+    return (void *)-1;
+  } else {
+    return (void *)-1;
+  }
 }
 
 int _read(int fd, void *buf, size_t count) {

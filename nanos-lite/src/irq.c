@@ -1,6 +1,6 @@
 #include <common.h>
 
-// #define STRACE
+#define STRACE
 
 #ifdef STRACE
 static void strace(char *type, Context *c) {
@@ -37,6 +37,11 @@ static Context* do_event(Event e, Context* c) {
             }
           }
           c->GPRx = c->GPR4;
+          break;
+        }
+        case 9: {
+          strace("SYS_brk", c);
+          c->GPRx = 0;
           break;
         }
         default: panic("Unhandled syscall type = %d", c->GPR1);
