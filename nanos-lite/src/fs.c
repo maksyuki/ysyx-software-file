@@ -31,6 +31,43 @@ static Finfo file_table[] __attribute__((used)) = {
 #include "files.h"
 };
 
+int fs_open(const char *pathname, int flags, int mode) {
+  int len = sizeof(file_table) / sizeof(file_table[0]);
+  int res = -1, i;
+  for (i = 0; i < len; ++i) {
+    if (!strcmp(file_table[i].name, pathname)) {
+      res = i;
+      break;
+    }
+  }
+
+  assert(i < len);
+  return res;
+}
+
+extern size_t ramdisk_read();
+size_t fs_read(int fd, void *buf, size_t len) {
+  assert(len <= file_table[fd].size);
+  static int cnt = 0;
+  static int filez = 0;
+  int offset = 0;
+  if (++cnt <= 2) {
+    offset = 0;
+    filez = len;
+  } else {
+    offset = filez;
+  }
+
+  // Log("[fs]offset: %d", offset);
+  return ramdisk_read(buf, file_table[fd].disk_offset + offset, len);
+}
+
+size_t fs_write(int fd, const void *buf, size_t len);
+size_t fs_lseek(int fd, size_t offset, int whence);
+int fs_close(int fd) {
+  return 0;
+}
+
 void init_fs() {
   // TODO: initialize the size of /dev/fb
 }

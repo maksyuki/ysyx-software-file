@@ -1,6 +1,6 @@
 #include <common.h>
 
-#define STRACE
+// #define STRACE
 
 #ifdef STRACE
 static void strace(char *type, Context *c) {
