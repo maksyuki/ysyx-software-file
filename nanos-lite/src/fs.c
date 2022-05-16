@@ -71,8 +71,10 @@ size_t fs_read(int fd, void *buf, size_t len) {
   if (++cnt <= 2) {
     offset = 0;
     filez = len;
-  } else {
+  } else if (cnt == 3) {
     offset = filez;
+  } else {
+    offset = file_state[fd].open_offset;
   }
 
   // Log("[fs]offset: %d", offset);
@@ -97,7 +99,21 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 }
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
+  if (fd <= 2) return -1;
 
+  assert(fd < FILE_TAB_LEN);
+  assert(file_state[fd].open);
+  switch(whence) {
+    case SEEK_SET: file_state[fd].open_offset = 0; break;
+    case SEEK_CUR: break;
+    case SEEK_END: file_state[fd].open_offset = file_table[fd].size; break;
+    default: assert(0);
+  }
+
+  file_state[fd].open_offset += offset;
+  assert(file_state[fd].open_offset >= 0);
+  assert(file_state[fd].open_offset <= file_table[fd].size);
+  return file_state[fd].open_offset;
 }
 
 int fs_close(int fd) {
