@@ -18,20 +18,23 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
   Log("fd: %d", fd);
 
-  Elf_Ehdr *elf;
+  Elf_Ehdr *elf_hdr;
   Elf_Phdr *ph = NULL;
   uint8_t buf[4096];
-  fs_read(fd, buf, 4096);
+  fs_read(fd, buf, 1024); // HACK: read len is not right?
   // ramdisk_read(buf, file_table[fd].disk_offset, 4096);
-  elf = (void*) buf;
+  elf_hdr = (void*) buf;
   
-  const uint32_t elf_magic = 0x464c457f;
+  // const uint32_t elf_magic = 0x464c457f;
+  Log("elf_hdr's size: %d", sizeof(Elf_Ehdr));
+  Log("elf->e_phoff: %d", elf_hdr->e_phoff);
 	uint32_t *p_magic = (void *)buf;
-  assert (*p_magic == elf_magic);
-  // Log("ELF: %p", elf);
+  assert (*p_magic == 0x464c457f);
+  // Log("ELF: %p", elf_hdr);
 
-  ph = (void *)(buf + elf->e_phoff);
-  for (int i = 0; i < elf->e_phnum; ++i, ++ph) {
+  ph = (void *)(buf + elf_hdr->e_phoff);
+  Log("elf_ph's size: %d", sizeof(Elf_Phdr));
+  for (int i = 0; i < elf_hdr->e_phnum; ++i, ++ph) {
     if (ph->p_type == PT_LOAD) {
       // read the content of the segment from the ELF file 
       // to the memory region [VirtAddr, VirtAddr + FileSiz)
@@ -44,7 +47,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     }
   }
 
-  volatile uint32_t entry = elf->e_entry;
+  volatile uint32_t entry = elf_hdr->e_entry;
   return entry;
 }
 
