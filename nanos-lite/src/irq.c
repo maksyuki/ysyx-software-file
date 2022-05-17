@@ -1,5 +1,5 @@
 #include <common.h>
-
+#include <sys/time.h>
 // #define STRACE
 
 #ifdef STRACE
@@ -70,6 +70,18 @@ static Context* do_event(Event e, Context* c) {
         }
         case 9: {
           strace("SYS_brk", c);
+          c->GPRx = 0;
+          break;
+        }
+        case 19: {
+          strace("SYS_gettimeofday", c);
+          // Log("tv: %p", c->GPR2);
+          struct timeval *tv = (struct timeval*)c->GPR2;
+          // Log("io read: %ld", io_read(AM_TIMER_UPTIME).us);
+          // for (volatile int i = 0; i < 100; i++) ; // HACK: fake impl
+          tv->tv_usec = io_read(AM_TIMER_UPTIME).us;
+          // tv = NULL;
+          // Log("tv->tv_usec: %ld", tv->tv_usec);
           c->GPRx = 0;
           break;
         }
