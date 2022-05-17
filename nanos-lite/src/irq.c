@@ -49,18 +49,10 @@ static Context* do_event(Event e, Context* c) {
         }
         case 4: {
           strace("SYS_write", c);
-          if (c->GPR2 == 1 || c->GPR2 == 2) {
-            char *buf = (char *) c->GPR3;
-            for(int i = 0; i < c->GPR4; ++i) {
-              putch(buf[i]);
-            }
-            c->GPRx = c->GPR4;
-          } else {
-            int fd = c->GPR2;
-            void *buf = (void *) c->GPR3;
-            size_t len = (size_t)c->GPR4;
-            c->GPRx = fs_write(fd, buf, len);
-          }
+          int fd = c->GPR2;
+          void *buf = (void *) c->GPR3;
+          size_t len = (size_t)c->GPR4;
+          c->GPRx = fs_write(fd, buf, len); // NOTE: support vfs oper
           break;
         }
         case 7: {

@@ -24,11 +24,12 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
   return 0;
 }
 
+extern size_t serial_write();
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
-  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
-  [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
+  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
+  [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
 #include "files.h"
 };
 
@@ -84,17 +85,23 @@ size_t fs_read(int fd, void *buf, size_t len) {
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
-  if (fd <= 2) return -1;
-
+  assert(fd >= 0);
   assert(fd < FILE_TAB_LEN);
-  assert(file_state[fd].open);
-  int remain_len = file_table[fd].size - file_state[fd].open_offset;
-  assert(remain_len >= 0);
-  if (remain_len < len) len = remain_len;
+  // Log("fd: %d", fd);
+  assert((fd <= 2) || (fd >= 3 && file_state[fd].open));
 
   // Log("[fs]offset: %d", offset);
-  size_t res_len = ramdisk_write(buf, file_table[fd].disk_offset + file_state[fd].open_offset, len);
-  file_state[fd].open_offset += res_len;
+  size_t res_len = 0;
+  if(fd <= 2) { // NOTE: can refactor in one oper?
+    res_len = file_table[fd].write(buf, 0, len);
+  } else {
+    int remain_len = file_table[fd].size - file_state[fd].open_offset;
+    assert(remain_len >= 0);
+    if (remain_len < len) len = remain_len;
+    res_len = ramdisk_write(buf, file_table[fd].disk_offset + file_state[fd].open_offset, len);
+    file_state[fd].open_offset += res_len;
+  }
+
   return res_len;
 }
 
@@ -117,7 +124,7 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
 }
 
 int fs_close(int fd) {
-  assert(file_state[fd].open);
+  // assert(file_state[fd].open); // BUG: ?
   file_state[fd].open = false;
   return 0;
 }

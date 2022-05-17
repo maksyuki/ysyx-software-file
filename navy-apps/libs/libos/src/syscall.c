@@ -62,8 +62,6 @@ int _open(const char *path, int flags, mode_t mode) {
 
 int _write(int fd, void *buf, size_t count) {
   return _syscall_(SYS_write, fd, (intptr_t) buf, count); // nOTE: buf pass the addr!
-  // _exit(SYS_write);
-  // return 0;
 }
 
 extern intptr_t end;
@@ -74,7 +72,7 @@ void *_sbrk(intptr_t increment) {
 
   //debug, NOTE: cannot use printf, otherwise trigger loop!
   char buf[60];
-  int len = sprintf(buf, "end: %10p\n", &end);
+  int len = sprintf(buf, "[debug]sbrk: end: %10p\n", &end);
   _write(1, buf, len);
 
   intptr_t res = _syscall_(SYS_brk, 0, 0, 0);
