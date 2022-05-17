@@ -58,29 +58,36 @@ int fs_open(const char *pathname, int flags, int mode) {
 extern size_t ramdisk_read();
 extern size_t ramdisk_write();
 size_t fs_read(int fd, void *buf, size_t len) {
-  if (fd <= 2) return -1;
-
+  assert(fd >= 0);
   assert(fd < FILE_TAB_LEN);
   assert(file_state[fd].open);
-  int remain_len = file_table[fd].size - file_state[fd].open_offset;
-  assert(remain_len >= 0);
-  if (remain_len < len) len = remain_len;
+  assert((fd <= 2) || (fd >= 3 && file_state[fd].open));
 
-  static int cnt = 0;
-  static int filez = 0;
-  int offset = 0;
-  if (++cnt <= 2) {
-    offset = 0;
-    filez = len;
-  } else if (cnt == 3) {
-    offset = filez;
+  size_t res_len = 0;
+  if (fd <= 2) {
+    panic("nanos lite dont support stdin read");
   } else {
-    offset = file_state[fd].open_offset;
+    int remain_len = file_table[fd].size - file_state[fd].open_offset;
+    assert(remain_len >= 0);
+    if (remain_len < len) len = remain_len;
+
+    static int cnt = 0;
+    static int filez = 0;
+    int offset = 0;
+    if (++cnt <= 2) {
+      offset = 0;
+      filez = len;
+    } else if (cnt == 3) {
+      offset = filez;
+    } else {
+      offset = file_state[fd].open_offset;
+    }
+
+    // Log("[fs]offset: %d", offset);
+    res_len = ramdisk_read(buf, file_table[fd].disk_offset + offset, len);
+    file_state[fd].open_offset += res_len;
   }
 
-  // Log("[fs]offset: %d", offset);
-  size_t res_len = ramdisk_read(buf, file_table[fd].disk_offset + offset, len);
-  file_state[fd].open_offset += res_len;
   return res_len;
 }
 
