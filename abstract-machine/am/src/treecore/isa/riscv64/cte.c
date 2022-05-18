@@ -9,7 +9,8 @@ Context* __am_irq_handle(Context *c) {
     Event ev = {0};
     switch (c->cause) {
       case 0x8000000000000007:
-        ev.event = EVENT_IRQ_TIMER; break;
+        ev.event = EVENT_IRQ_TIMER;
+        break;
       case 11:
         if (c->GPR1 == -1) {
           ev.event = EVENT_YIELD;
@@ -20,7 +21,8 @@ Context* __am_irq_handle(Context *c) {
         }
         break;
       default:
-        ev.event = EVENT_ERROR; break;
+        ev.event = EVENT_ERROR;
+        break;
     }
 
     c = user_handler(ev, c);
