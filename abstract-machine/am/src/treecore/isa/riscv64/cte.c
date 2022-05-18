@@ -47,8 +47,9 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   Context *res = kstack.end - sizeof(Context) - 4;
-  res->status = 0x1800;
+  res->status = 0x1800; // NOTE: only exec once
   res->epc = (uintptr_t)entry;
+  res->gpr[10] = (uintptr_t) arg; // calling convention->a0
   printf("res->status: %d", res->status);
   return res;
 }
