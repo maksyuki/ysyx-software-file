@@ -11,6 +11,7 @@ static void strace(char *type, Context *c) {
 }
 #endif
 
+extern Context* schedule();
 extern int fs_open();
 extern int fs_close();
 extern size_t fs_read();
@@ -18,8 +19,11 @@ extern size_t fs_write();
 extern size_t fs_lseek();
 static Context* do_event(Event e, Context* c) {
   switch (e.event) {
-    case EVENT_YIELD:
-      Log("[nanos-lite] ======YIELD TEST RESULT======"); break;
+     // NOTE: for context switch
+    case EVENT_YIELD: {
+      Log("[nanos-lite](kernel yield)process context switch");
+      return schedule(c);
+      }
     case EVENT_SYSCALL:
     {
       switch(c->GPR1) {

@@ -19,10 +19,18 @@ void hello_fun(void *arg) {
   }
 }
 
+void context_kload(PCB *pcb, void (*entry)(void *), void *args) {
+  Area kra;
+  kra.start = &pcb->cp;
+  kra.end = kra.start + STACK_SIZE;
+  pcb->cp = kcontext(kra, entry, args);
+}
+
 extern void naive_uload();
 void init_proc() {
+  context_kload(&pcb[0], hello_fun, NULL);
   switch_boot_pcb();
-
+  yield(); // NOTE: for test
   Log("Initializing processes...");
 
   // load program here
@@ -30,5 +38,7 @@ void init_proc() {
 }
 
 Context* schedule(Context *prev) {
-  return NULL;
+  current->cp = prev;
+  current = &pcb[0];
+  return current->cp;
 }
