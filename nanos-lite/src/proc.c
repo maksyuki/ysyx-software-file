@@ -28,14 +28,14 @@ void context_kload(PCB *pcb, void (*entry)(void *), void *args) {
 
 extern void naive_uload();
 void init_proc() {
-  context_kload(&pcb[0], hello_fun, "1");
-  context_kload(&pcb[1], hello_fun, "2");
+  // context_kload(&pcb[0], hello_fun, "1");
+  // context_kload(&pcb[1], hello_fun, "2");
   switch_boot_pcb();
-  yield(); // NOTE: for test
+  // yield(); // NOTE: for test context switch
   Log("Initializing processes...");
 
   // load program here
-  naive_uload(NULL, "/bin/timer-test");
+  naive_uload(NULL, "/bin/event-test");
 }
 
 Context* schedule(Context *prev) {

@@ -30,6 +30,7 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
+  {"/dev/events", 0, 0, invalid_read, invalid_write},
 #include "files.h"
 };
 
@@ -52,11 +53,13 @@ int fs_open(const char *pathname, int flags, int mode) {
   }
 
   assert(i < FILE_TAB_LEN);
+  // Log("fs: i: %d", i);
   return res;
 }
 
 extern size_t ramdisk_read();
 extern size_t ramdisk_write();
+extern size_t events_read();
 size_t fs_read(int fd, void *buf, size_t len) {
   assert(fd >= 0);
   assert(fd < FILE_TAB_LEN);
@@ -66,6 +69,8 @@ size_t fs_read(int fd, void *buf, size_t len) {
   size_t res_len = 0;
   if (fd <= 2) {
     panic("nanos lite dont support stdin read");
+  } else if (fd == 3) {
+    res_len = events_read(buf, 0, 0);
   } else {
     int remain_len = file_table[fd].size - file_state[fd].open_offset;
     assert(remain_len >= 0);

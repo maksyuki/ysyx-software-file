@@ -50,7 +50,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   res->status = 0x1800; // NOTE: only exec once
   res->epc = (uintptr_t)entry;
   res->gpr[10] = (uintptr_t) arg; // calling convention->a0
-  printf("res->status: %d", res->status);
+  // printf("res->status: %d", res->status);
   return res;
 }
 
