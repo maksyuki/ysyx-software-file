@@ -19,7 +19,7 @@ uint32_t NDL_GetTicks() {
 
 int NDL_PollEvent(char *buf, int len) {
   int fp = open("/dev/events", O_RDONLY);
-  return read(fp, buf, sizeof(char) * len);
+  return read(fp, buf, sizeof(char) * len); // NOTE: not really use 'len' in fs_read!
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
@@ -43,6 +43,7 @@ void NDL_OpenCanvas(int *w, int *h) {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {

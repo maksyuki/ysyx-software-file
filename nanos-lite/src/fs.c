@@ -53,7 +53,7 @@ int fs_open(const char *pathname, int flags, int mode) {
   }
 
   assert(i < FILE_TAB_LEN);
-  // Log("fs: i: %d", i);
+  printf("[fs]: pathname: %s, res: %d\n", pathname, res);
   return res;
 }
 
@@ -72,6 +72,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
   } else if (fd == 3) {
     res_len = events_read(buf, 0, 0);
   } else {
+    printf("other files: %p\n", buf);
     int remain_len = file_table[fd].size - file_state[fd].open_offset;
     assert(remain_len >= 0);
     if (remain_len < len) len = remain_len;
