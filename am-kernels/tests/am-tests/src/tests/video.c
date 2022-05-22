@@ -1,6 +1,6 @@
 #include <amtest.h>
 
-#define FPS 30
+#define FPS 60
 #define N   32
 
 static inline uint32_t pixel(uint8_t r, uint8_t g, uint8_t b) {
@@ -33,7 +33,7 @@ void redraw() {
   io_write(AM_GPU_FBDRAW, 0, 0, NULL, 0, 0, true);
 }
 
-static uint32_t p(int tsc) {
+static inline uint32_t p(int tsc) {
   int b = tsc & 0xff;
   return pixel(b * 6, b * 7, b);
 }
