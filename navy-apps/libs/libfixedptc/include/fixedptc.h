@@ -125,37 +125,41 @@ typedef	__uint128_t fixedptud;
  * Putting them only in macros will effectively make them optional. */
 #define fixedpt_tofloat(T) ((float) ((T)*((float)(1)/(float)(1L << FIXEDPT_FBITS))))
 
+static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B);
+static inline fixedpt fixedpt_div(fixedpt A, fixedpt B);
 /* Multiplies a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_muli(fixedpt A, int B) {
-	return 0;
+	return fixedpt_mul(A, fixedpt_fromint(B));
 }
 
 /* Divides a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_divi(fixedpt A, int B) {
-	return 0;
+	return fixedpt_div(A, fixedpt_fromint(B));
 }
 
 /* Multiplies two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
-	return 0;
+	return (A * B) / FIXEDPT_ONE;
 }
 
 
 /* Divides two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_div(fixedpt A, fixedpt B) {
-	return 0;
+	return (A / B) * FIXEDPT_ONE;
 }
 
 static inline fixedpt fixedpt_abs(fixedpt A) {
-	return 0;
+	return (A < 0) ? fixedpt_muli(A, -1) : A;
 }
 
 static inline fixedpt fixedpt_floor(fixedpt A) {
-	return 0;
+	return A;
 }
 
 static inline fixedpt fixedpt_ceil(fixedpt A) {
-	return 0;
+	if (fixedpt_fracpart(A)) return fixedpt_add(A, FIXEDPT_ONE);
+	else return A;
+	
 }
 
 /*

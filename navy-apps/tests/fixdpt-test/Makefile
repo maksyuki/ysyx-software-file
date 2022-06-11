@@ -1,3 +1,3 @@
 NAME = fixdpt-test
-SRCS = main.cpp
+SRCS = main.c
 include $(NAVY_HOME)/Makefile
