@@ -57,3 +57,11 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
+void context_uload(PCB *pcb, const char *filename) {
+  uintptr_t entry = loader(pcb, filename);
+  Area kra;
+  kra.start = &pcb->cp;
+  kra.end = kra.start + STACK_SIZE;
+  printf("entry: %p\n", (void *)entry);
+  pcb->cp = ucontext(NULL, kra, (void *)entry);
+}
