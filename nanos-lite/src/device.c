@@ -15,6 +15,7 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t serial_write(const void *buf, size_t offset, size_t len) {
+  yield();
   char *arr = (char *)buf;
   for(int i = 0; i < len; ++i) {
     putch(arr[i]);
@@ -38,6 +39,7 @@ static uint8_t web_code_map[] = {
 };
 
 size_t events_read(void *buf, size_t offset, size_t len) {
+  yield();
   AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
   char *tmp = "";
   strcpy(tmp, keyname[web_code_map[ev.keycode]]);
