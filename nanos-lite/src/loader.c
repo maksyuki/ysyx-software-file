@@ -63,5 +63,7 @@ void context_uload(PCB *pcb, const char *filename) {
   kra.start = &pcb->cp;
   kra.end = kra.start + STACK_SIZE;
   printf("entry: %p\n", (void *)entry);
-  pcb->cp = ucontext(NULL, kra, (void *)entry);
+  Context *contx = ucontext(NULL, kra, (void *)entry);
+  contx->GPRx = (uintptr_t)heap.end;
+  pcb->cp = contx;
 }
