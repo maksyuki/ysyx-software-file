@@ -1,5 +1,6 @@
 #include <proc.h>
 #include <elf.h>
+#include <string.h>
 
 #ifdef __LP64__
 # define Elf_Ehdr Elf64_Ehdr
@@ -65,12 +66,19 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   printf("[context_uload]entry: %p\n", (void *)entry);
   int argc_cnt = 0;
   for(int i = 0; argv[i]; ++i) { // NOTE: need to use 'argc' to get the loop num!
-    printf("[context_uload] argv[%d]: %s\n", i, argv[i]);
+    printf("[context_uload] argv[%d]: %s len: %d\n", i, argv[i], strlen(argv[i]));
     ++argc_cnt;
   }
 
   Context *contx = ucontext(NULL, kra, (void *)entry);
   // balabala change the heap.end
+  for(int i = argc_cnt - 1; i >= 0; --i) {
+    heap.end -= strlen(argv[i]) + 1;
+    printf("[bef]heap.end: %p\n", heap.end);
+    *(char *)heap.end = argv[i];
+    printf("[aft]heap.end: %p\n", heap.end);
+  }
+
   heap.end -= sizeof(int);
   *(int *)(heap.end) = argc_cnt;
   printf("[context_uload] argc_cnt: %p,  %d\n", heap.end, argc_cnt);

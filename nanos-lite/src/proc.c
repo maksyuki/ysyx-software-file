@@ -32,7 +32,7 @@ void init_proc() {
   context_kload(&pcb[0], hello_fun, "1");
   // context_kload(&pcb[1], hello_fun, "2");
   char *empty[] =  {NULL};
-  char *demo[] = {"--h", NULL};
+  char *demo[] = {"--h", "-t", NULL};
   context_uload(&pcb[1], "/bin/hello", demo, empty);
 
   switch_boot_pcb();
