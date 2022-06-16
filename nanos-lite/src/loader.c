@@ -62,8 +62,18 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   Area kra;
   kra.start = &pcb->cp;
   kra.end = kra.start + STACK_SIZE;
-  printf("entry: %p\n", (void *)entry);
+  printf("[context_uload]entry: %p\n", (void *)entry);
+  int argc_cnt = 0;
+  for(int i = 0; argv[i]; ++i) { // NOTE: need to use 'argc' to get the loop num!
+    printf("[context_uload] argv[%d]: %s\n", i, argv[i]);
+    ++argc_cnt;
+  }
+
   Context *contx = ucontext(NULL, kra, (void *)entry);
-  contx->GPRx = (uintptr_t)heap.end;
+  // balabala change the heap.end
+  heap.end -= sizeof(int);
+  *(int *)(heap.end) = argc_cnt;
+  printf("[context_uload] argc_cnt: %p,  %d\n", heap.end, argc_cnt);
+  contx->GPRx = (uintptr_t)(heap.end);
   pcb->cp = contx;
 }
