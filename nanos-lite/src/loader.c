@@ -74,9 +74,11 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   // balabala change the heap.end
   for(int i = argc_cnt - 1; i >= 0; --i) {
     heap.end -= strlen(argv[i]) + 1;
-    printf("[bef]heap.end: %p\n", heap.end);
-    *(char *)heap.end = argv[i];
-    printf("[aft]heap.end: %p\n", heap.end);
+    printf("heap.end: %p\n", heap.end);
+    // HACK: can refactor below impl
+    for(int j = 0; argv[i][j]; ++j) {
+      *(char *)(heap.end + j) = argv[i][j];
+    }
   }
 
   heap.end -= sizeof(int);
