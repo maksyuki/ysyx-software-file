@@ -26,7 +26,7 @@ static Context *do_event(Event e, Context *c)
     // NOTE: for context switch
   case EVENT_YIELD:
   {
-    Log("[nanos-lite](kernel yield)process context switch");
+    // Log("[nanos-lite](kernel yield)process context switch");
     return schedule(c);
   }
   break;

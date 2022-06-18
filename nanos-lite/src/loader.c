@@ -71,16 +71,31 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   }
 
   Context *contx = ucontext(NULL, kra, (void *)entry);
-  // balabala change the heap.end
+  // string area(include exec program path[argv[0]])
+  uintptr_t str_addr[argc_cnt];
   for(int i = argc_cnt - 1; i >= 0; --i) {
     heap.end -= strlen(argv[i]) + 1;
-    printf("heap.end: %p\n", heap.end);
+    // printf("heap.end: %p\n", heap.end);
+    str_addr[i] = (uintptr_t)heap.end;
     // HACK: can refactor below impl
     for(int j = 0; argv[i][j]; ++j) {
       *(char *)(heap.end + j) = argv[i][j];
     }
   }
 
+  for(int i = 0; i < argc_cnt; ++i) {
+    printf("str addr: %p\n", str_addr[i]);
+  }
+
+  // argv pointer
+  heap.end -= sizeof(void *);
+  *((char **)heap.end) = NULL;
+  for(int i = argc_cnt - 1; i >= 0; --i) {
+    heap.end -= sizeof(void *);
+    *((uintptr_t *)heap.end) = str_addr[i];
+  }
+
+  // argc
   heap.end -= sizeof(int);
   *(int *)(heap.end) = argc_cnt;
   printf("[context_uload] argc_cnt: %p,  %d\n", heap.end, argc_cnt);
