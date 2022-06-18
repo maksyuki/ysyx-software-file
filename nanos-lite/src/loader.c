@@ -58,13 +58,23 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
+void assign_str(int idx, const char *str, uintptr_t *str_addr) {
+  heap.end -= strlen(str) + 1;
+  str_addr[idx] = (uintptr_t)heap.end;
+  // printf("heap.end: %p\n", heap.end);
+  // HACK: can refactor below impl
+  for(int j = 0; str[j]; ++j) {
+    *(char *)(heap.end + j) = str[j];
+  }
+}
+
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
   uintptr_t entry = loader(pcb, filename);
   Area kra;
   kra.start = &pcb->cp;
   kra.end = kra.start + STACK_SIZE;
   printf("[context_uload]entry: %p\n", (void *)entry);
-  int argc_cnt = 0;
+  int argc_cnt = 1;
   for(int i = 0; argv[i]; ++i) { // NOTE: need to use 'argc' to get the loop num!
     printf("[context_uload] argv[%d]: %s len: %d\n", i, argv[i], strlen(argv[i]));
     ++argc_cnt;
@@ -74,12 +84,10 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   // string area(include exec program path[argv[0]])
   uintptr_t str_addr[argc_cnt];
   for(int i = argc_cnt - 1; i >= 0; --i) {
-    heap.end -= strlen(argv[i]) + 1;
-    // printf("heap.end: %p\n", heap.end);
-    str_addr[i] = (uintptr_t)heap.end;
-    // HACK: can refactor below impl
-    for(int j = 0; argv[i][j]; ++j) {
-      *(char *)(heap.end + j) = argv[i][j];
+    if(i == 0) {
+      assign_str(i, filename, str_addr);
+    } else {
+      assign_str(i, argv[i-1], str_addr);
     }
   }
 

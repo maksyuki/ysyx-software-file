@@ -9,9 +9,9 @@ void call_main(uintptr_t *args) {
   printf("[call_main]args: %p\n", args);
   uintptr_t *p = args;
   int argc = *(int *)p;
-  printf("p addr: %p\n", p);
+  printf("[bef]p addr: %p\n", p);
   p = (uintptr_t *)((int *)p + 1);
-  printf("p addr: %p\n", p);
+  printf("[aft]p addr: %p\n", p);
 
   char *argv[argc];
   char *envp[] =  { NULL };
