@@ -58,13 +58,13 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
-void assign_str(int idx, const char *str, uintptr_t *str_addr) {
-  heap.end -= strlen(str) + 1;
-  str_addr[idx] = (uintptr_t)heap.end;
+void assign_str(int idx, const char *str, uintptr_t *str_addr, void **heap) {
+  *heap -= strlen(str) + 1;
+  str_addr[idx] = (uintptr_t)(*heap);
   // printf("heap.end: %p\n", heap.end);
   // HACK: can refactor below impl
   for(int j = 0; str[j]; ++j) {
-    *(char *)(heap.end + j) = str[j];
+    *(char *)(*heap + j) = str[j];
   }
 }
 
@@ -81,13 +81,18 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   }
 
   Context *contx = ucontext(NULL, kra, (void *)entry);
+  // allocate user heap
+  void *proc_heap = new_page(8); // 8 * 4Kb size
+  proc_heap += 8 * PGSIZE; // get stack top
+  printf("proc heap: %p\n", proc_heap);
+
   // string area(include exec program path[argv[0]])
   uintptr_t str_addr[argc_cnt];
   for(int i = argc_cnt - 1; i >= 0; --i) {
     if(i == 0) {
-      assign_str(i, filename, str_addr);
+      assign_str(i, filename, str_addr, &proc_heap);
     } else {
-      assign_str(i, argv[i-1], str_addr);
+      assign_str(i, argv[i-1], str_addr, &proc_heap);
     }
   }
 
@@ -96,17 +101,17 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   }
 
   // argv pointer
-  heap.end -= sizeof(void *);
-  *((char **)heap.end) = NULL;
+  proc_heap -= sizeof(void *);
+  *((char **)proc_heap) = NULL;
   for(int i = argc_cnt - 1; i >= 0; --i) {
-    heap.end -= sizeof(void *);
-    *((uintptr_t *)heap.end) = str_addr[i];
+    proc_heap -= sizeof(void *);
+    *((uintptr_t *)proc_heap) = str_addr[i];
   }
 
   // argc
-  heap.end -= sizeof(int);
-  *(int *)(heap.end) = argc_cnt;
-  printf("[context_uload] argc_cnt: %p,  %d\n", heap.end, argc_cnt);
-  contx->GPRx = (uintptr_t)(heap.end);
+  proc_heap -= sizeof(int);
+  *(int *)(proc_heap) = argc_cnt;
+  printf("[context_uload] proc stack top: %p,  argc_cnt: %d\n", proc_heap, argc_cnt);
+  contx->GPRx = (uintptr_t)(proc_heap);
   pcb->cp = contx;
 }
