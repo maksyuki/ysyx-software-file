@@ -34,7 +34,8 @@ void init_proc() {
   // context_kload(&pcb[1], hello_fun, "2");
   char *empty[] =  {NULL};
   // char *demo[] = {"--h", "-t", NULL};
-  context_uload(&pcb[1], "/bin/hello", empty, empty);
+  // context_uload(&pcb[1], "/bin/hello", empty, empty);
+  context_uload(&pcb[1], "/bin/exec-test", empty, empty);
 
   switch_boot_pcb();
   yield(); // NOTE: for test context switch

@@ -1,6 +1,6 @@
 #include <common.h>
 #include <sys/time.h>
-// #define STRACE
+#define STRACE
 
 #ifdef STRACE
 static void strace(char *type, Context *c)
@@ -89,6 +89,15 @@ static Context *do_event(Event e, Context *c)
     case 9:
     {
       strace("SYS_brk", c);
+      c->GPRx = 0;
+    }
+    break;
+    case 13:
+    {
+      strace("SYS_execve", c);
+      printf("fname: %s\n", (char *)c->GPR2);
+      printf("argv: %p\n", (char *)c->GPR3);
+      printf("envp: %s\n", (char *)c->GPR4);
       c->GPRx = 0;
     }
     break;
