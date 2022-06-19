@@ -74,9 +74,16 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   kra.start = &pcb->cp;
   kra.end = kra.start + STACK_SIZE;
   printf("[context_uload]entry: %p\n", (void *)entry);
+
   int argc_cnt = 1;
-  for(int i = 0; argv[i]; ++i) { // NOTE: need to use 'argc' to get the loop num!
+  bool is_incl_fn = false;
+  // NOTE: need to use 'argc' to get the loop num!
+  for(int i = 0; argv[i]; ++i) {
     printf("[context_uload] argv[%d]: %s len: %d\n", i, argv[i], strlen(argv[i]));
+    if(!strcmp(filename, argv[i])) {
+      is_incl_fn = true;
+      continue;
+    }
     ++argc_cnt;
   }
 
@@ -84,20 +91,25 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   // allocate user heap
   void *proc_heap = new_page(8); // 8 * 4Kb size
   proc_heap += 8 * PGSIZE; // get stack top
-  printf("proc heap: %p\n", proc_heap);
+  printf("[context_uload]proc heap: %p\n", proc_heap);
 
   // string area(include exec program path[argv[0]])
   uintptr_t str_addr[argc_cnt];
+  // HACK: handle argv[0] == filename 
   for(int i = argc_cnt - 1; i >= 0; --i) {
     if(i == 0) {
       assign_str(i, filename, str_addr, &proc_heap);
     } else {
-      assign_str(i, argv[i-1], str_addr, &proc_heap);
+      if(is_incl_fn) {
+        assign_str(i, argv[i], str_addr, &proc_heap);
+      } else {
+        assign_str(i, argv[i-1], str_addr, &proc_heap);
+      }
     }
   }
 
   for(int i = 0; i < argc_cnt; ++i) {
-    printf("str addr: %p\n", str_addr[i]);
+    printf("[context_uload]str addr: %p val: %s\n", str_addr[i], str_addr[i]);
   }
 
   // argv pointer
@@ -111,7 +123,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   // argc
   proc_heap -= sizeof(int);
   *(int *)(proc_heap) = argc_cnt;
-  printf("[context_uload] proc stack top: %p,  argc_cnt: %d\n", proc_heap, argc_cnt);
   contx->GPRx = (uintptr_t)(proc_heap);
   pcb->cp = contx;
+  printf("[context_uload] proc stack top: %p contx: %p argc_cnt: %d\n", proc_heap, pcb->cp, argc_cnt);
 }

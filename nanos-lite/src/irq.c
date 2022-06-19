@@ -19,6 +19,7 @@ extern int fs_close();
 extern size_t fs_read();
 extern size_t fs_write();
 extern size_t fs_lseek();
+extern int cust_execve();
 static Context *do_event(Event e, Context *c)
 {
   switch (e.event)
@@ -95,10 +96,13 @@ static Context *do_event(Event e, Context *c)
     case 13:
     {
       strace("SYS_execve", c);
-      printf("fname: %s\n", (char *)c->GPR2);
-      printf("argv: %p\n", (char *)c->GPR3);
-      printf("envp: %s\n", (char *)c->GPR4);
-      c->GPRx = 0;
+      // man execve: replace current process
+      char *fname = (char *)c->GPR2;
+      char **argv = (char **)c->GPR3;
+      char **envp = (char **)c->GPR4;
+      printf("[SYS_execve]fname: %s\n", fname);
+      c->GPRx = cust_execve(fname, argv, envp);
+      // c->GPRx = 0;
     }
     break;
     case 19:

@@ -73,6 +73,6 @@ Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   Context *res = kstack.end - sizeof(Context);
   res->status = 0x1800; // NOTE: only exec once
   res->epc = (uintptr_t)entry;
-  printf("res->epc: %x\n", res->epc);
+  printf("[ucontext]res->epc: %x kra[s-e] [%p-%p]\n", res->epc, kstack.start, kstack.end);
   return res;
 }

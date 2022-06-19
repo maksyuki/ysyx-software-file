@@ -51,6 +51,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   res->epc = (uintptr_t)entry;
   res->gpr[10] = (uintptr_t) arg; // calling convention->a0
   // printf("res->status: %d", res->status);
+  printf("[kcontext]res->epc: %x kra[s-e] [%p-%p]\n", res->epc, kstack.start, kstack.end);
   return res;
 }
 
