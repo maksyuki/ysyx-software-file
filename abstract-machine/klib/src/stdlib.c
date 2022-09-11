@@ -29,6 +29,25 @@ int atoi(const char* nptr) {
   return x;
 }
 
+char *itoa(unsigned int val, char *str, int base) {
+  char *p = str;
+  while(val) {
+    int tmp = val % base;
+    if(tmp <= 9)
+      *p++ = '0' + tmp;
+    else
+      *p++ = 'A' + tmp - 10;
+    val /= base;
+  }
+  for(char *i = str, *j = p - 1; i < p; ++i, --j) {
+    if(i >= j) break;
+    char tmp = *i;
+    *i = *j;
+    *j = tmp;
+  }
+  *p = 0;
+  return str;
+}
 
 void *malloc(size_t size) {
   static void *program_break = 0;

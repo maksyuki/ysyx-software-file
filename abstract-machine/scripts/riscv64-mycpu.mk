@@ -1,23 +1,22 @@
 CROSS_COMPILE := riscv64-linux-gnu-
-COMMON_FLAGS  := -fno-pic -march=rv64ifd -mcmodel=medany
+COMMON_FLAGS  := -fno-pic -march=rv64imfd -mcmodel=medany
 CFLAGS        += $(COMMON_FLAGS) -static
 ASFLAGS       += $(COMMON_FLAGS) -O0
 LDFLAGS       += -melf64lriscv
 
 AM_SRCS := mycpu/start.S \
            mycpu/trm.c \
-           mycpu/libgcc/muldi3.S \
-           mycpu/libgcc/div.S \
            mycpu/ioe.c \
            mycpu/timer.c \
            mycpu/input.c \
            mycpu/cte.c \
            mycpu/trap.S \
            mycpu/vme.c \
-           mycpu/mpe.c
+           mycpu/mpe.c \
+           mycpu/uart.c
 
 CFLAGS    += -fdata-sections -ffunction-sections
-LDFLAGS   += -T $(AM_HOME)/scripts/platform/nemu.ld --defsym=_pmem_start=0x80000000 --defsym=_entry_offset=0x0
+LDFLAGS   += -T $(AM_HOME)/scripts/platform/core_flash.ld --defsym=_pmem_start=0x30000000 --defsym=_entry_offset=0x0
 LDFLAGS   += --gc-sections -e _start
 CFLAGS += -DMAINARGS=\"$(mainargs)\"
 .PHONY: $(AM_HOME)/am/src/mycpu/trm.c

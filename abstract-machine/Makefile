@@ -59,7 +59,7 @@ ARCHIVE   = $(WORK_DIR)/build/$(NAME)-$(ARCH).a
 OBJS      = $(addprefix $(DST_DIR)/, $(addsuffix .o, $(basename $(SRCS))))
 LIBS     := $(sort $(LIBS) am klib) # lazy evaluation ("=") causes infinite recursions
 LINKAGE   = $(OBJS) \
-  $(addsuffix -$(ARCH).a, $(join \
+    $(addsuffix -$(ARCH).a, $(join \
     $(addsuffix /build/, $(addprefix $(AM_HOME)/, $(LIBS))), \
     $(LIBS) ))
 
