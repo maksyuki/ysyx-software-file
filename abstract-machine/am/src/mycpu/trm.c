@@ -15,8 +15,7 @@ Area heap = RANGE(&_heap_start, PMEM_END);
 #endif
 static const char mainargs[] = MAINARGS;
 
-#define SOC_ENV
-// NOTE: comment for soc prj, because soc need uart to putch
+// #define SOC_ENV
 void putch(char ch)
 {
 #ifdef SOC_ENV
